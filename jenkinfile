@@ -1,12 +1,30 @@
 pipeline {
-  agent {
-    docker { image 'node:16-alpine' }
-  }
-  stages {
-    stage('Build') {
-      steps {
-        sh 'npm install --save'
-      }
+    agent {
+        docker {  image 'node:16-alpine' }
     }
-  }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'npm install --save'
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                // Install Snyk and run security test
+                sh 'npm install -g snyk'
+                sh 'snyk test'
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline execution complete.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+        success {
+            echo 'Pipeline succeeded.'
+        }
+    }
 }
